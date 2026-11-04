@@ -118,6 +118,17 @@
   @keyframes popup { 0% { opacity: 0; transform: translate(-50%,-30%) scale(.6); } 20% { opacity: 1; transform: translate(-50%,-60%) scale(1.15); }
     100% { opacity: 0; transform: translate(-50%,-160%) scale(1); } }
   .tapme { cursor: pointer; }
+  #caption { display: none !important; }
+  #stage.fadein { animation: scenefade 1s ease; }
+  @keyframes scenefade { from { opacity: 0; filter: brightness(.3); } to { opacity: 1; filter: none; } }
+  #stage .sky { animation: camera 14s ease-out forwards; transform-origin: 50% 70%; }
+  @keyframes camera { from { transform: scale(1.0); } to { transform: scale(1.08); } }
+  #player::before, #player::after { content: ''; position: absolute; left: 0; right: 0; height: 5vh; background: #000; z-index: 4; pointer-events: none; }
+  #player::before { top: 0; } #player::after { bottom: 0; }
+  #player.paused #stage { filter: brightness(.6); }
+  #player.paused #stage::after { content: '▶'; position: absolute; left: 50%; top: 50%; transform: translate(-50%,-50%);
+    font-size: 18vmin; color: #fff; text-shadow: 0 4px 20px rgba(0,0,0,.5); z-index: 6; }
+  #hud { z-index: 7; }
   .tapme::after {
     content: "👆"; position: absolute; font-size: .35em; right: -10%; bottom: -15%;
     animation: pulse 1s infinite; transform: none;
@@ -140,7 +151,7 @@
   #hud .grow { flex: 1; }
   #progress { height: 10px; background: rgba(255,255,255,.6); border-radius: 99px; overflow: hidden; }
   #progress i { display: block; height: 100%; width: 0; background: var(--accent); transition: width .5s; }
-  #counter { min-width: 64px; text-align: center; }
+  #counter { min-width: 44px; text-align: center; font-size: 18px; }
 
   /* Curtain */
   #curtain { position: absolute; inset: 0; z-index: 10; display: flex; cursor: pointer; }
@@ -223,7 +234,7 @@
   </div>
   <div id="curtain">
     <div class="half"></div><div class="half"></div>
-    <div class="label"><b>🎬 Story time!</b><span id="curtainTitle"></span><br><small>tap to open the curtain</small></div>
+    <div class="label"><b>🎬 Story time!</b><span id="curtainTitle"></span><br><small>▶ tap to start the movie</small></div>
   </div>
 </section>
 
@@ -345,7 +356,7 @@ const BUILTIN = [
         actors: [{ id: 'crow', e: '🐦‍⬛', x: 30, y: 46, s: 16, cls: 'bob' },
                  { id: 'pot', e: '🏺', x: 55, y: 58, s: 34 },
                  { id: 'pile', e: '🪨', x: 84, y: 70, s: 18, cls: 'tapme' }],
-        text: { en: 'Help the crow! Tap the pebbles to drop them into the pot.', hi: 'कौवे की मदद करो! कंकड़ पर टैप करके उन्हें मटके में डालो।' },
+        text: { en: 'One by one, the clever crow dropped pebbles into the pot. Plop! Plop! Plop!', hi: 'चालाक कौवे ने एक-एक करके मटके में कंकड़ डाले। टप! टप! टप!' },
         tap: { target: 'pile', times: 5,
                hint: { en: 'Tap the pebbles 🪨', hi: 'कंकड़ पर टैप करो 🪨' },
                onTap(i, api) { api.flyPebble(); api.setWater(i / 5); } } },
@@ -384,7 +395,7 @@ const BUILTIN = [
         actors: [{ id: 'flag', e: '🏁', x: 90, y: 60, s: 18 }, { id: 'tree', e: '🌳', x: 58, y: 48, s: 30 },
                  { id: 'hare', e: '🐇', x: 60, y: 66, s: 18 }, { id: 'z', e: '💤', x: 66, y: 52, s: 10, cls: 'zzz' },
                  { id: 'tort', e: '🐢', x: 10, y: 76, s: 16, cls: 'tapme' }],
-        text: { en: 'The tortoise kept walking, step by step. Tap the tortoise to help him walk!', hi: 'कछुआ कदम-कदम चलता रहा। कछुए पर टैप करो और उसे चलाओ!' },
+        text: { en: 'But the tortoise did not stop. He kept walking, step by step, step by step.', hi: 'पर कछुआ रुका नहीं। वह कदम-कदम, कदम-कदम चलता रहा।' },
         tap: { target: 'tort', times: 6,
                hint: { en: 'Tap the tortoise 🐢', hi: 'कछुए पर टैप करो 🐢' },
                onTap(i, api) { api.move('tort', 10 + i * 13.5); } } },
@@ -407,7 +418,7 @@ const BUILTIN = [
       { sky: 'linear-gradient(#9fb7c9,#c9d8e3 60%,#a5753f 60%,#8a5e30)',
         actors: [{ id: 'cloud', e: '🌧️', x: 60, y: 22, s: 22, cls: 'tapme' }, { id: 'seed', e: '🫘', x: 60, y: 66, s: 8 },
                  { id: 'girl', e: '👧', x: 22, y: 52, s: 20 }],
-        text: { en: 'The seed needs water. Tap the cloud to make it rain!', hi: 'बीज को पानी चाहिए। बादल पर टैप करो और बारिश कराओ!' },
+        text: { en: 'The seed needed water. Then the rain came — pitter, patter, pitter, patter!', hi: 'बीज को पानी चाहिए था। फिर बारिश आई — टिप-टिप, टिप-टिप!' },
         tap: { target: 'cloud', times: 4,
                hint: { en: 'Tap the cloud 🌧️', hi: 'बादल पर टैप करो 🌧️' },
                onTap(i, api) {
@@ -433,16 +444,23 @@ const state = {
   lang: store.get('psb.lang', 'en'),
   voice: store.get('psb.voice', true),
   mine: store.get('psb.mine', []),
-  story: null, idx: 0, score: 0, busy: false, taps: 0,
+  story: null, idx: 0, score: 0, busy: false, taps: 0, token: 0, paused: false,
 };
 const $ = (s) => document.querySelector(s);
 const show = (id) => ['home', 'maker', 'player'].forEach((x) => $('#' + x).classList.toggle('hidden', x !== id));
 
 /* ---------- Speech ---------- */
-function speak(text) {
-  if (!state.voice || !('speechSynthesis' in window)) return;
+function speak(text, onDone) {
+  // onDone fires once when narration ends (or after an estimated time if there is no voice).
+  let fired = false; const t0 = Date.now();
+  const est = 600 + text.length * (state.lang === 'hi' ? 85 : 75);
+  const done = (minLeft = 0) => { if (fired || !onDone) return; fired = true; setTimeout(onDone, Math.max(0, minLeft)); };
+  if (onDone) setTimeout(() => done(), est * 2 + 3000);            // safety net
+  if (!state.voice || !('speechSynthesis' in window) || !text) { done(est); return; }
   speechSynthesis.cancel();
   const u = new SpeechSynthesisUtterance(text.replace(/[\u{1F300}-\u{1FAFF}☀-➿]/gu, ''));
+  u.onend = () => done(Math.max(0, 1200 - (Date.now() - t0)));
+  u.onerror = () => done(Math.max(0, est - (Date.now() - t0)));
   const want = state.lang === 'hi' ? 'hi' : 'en';
   const v = speechSynthesis.getVoices().find((x) => x.lang.toLowerCase().startsWith(want + '-in'))
          || speechSynthesis.getVoices().find((x) => x.lang.toLowerCase().startsWith(want));
@@ -574,7 +592,7 @@ $('#makerBack').onclick = () => { renderHome(); show('home'); };
 let fromMaker = false;
 function play(story, preview = false) {
   fromMaker = preview;
-  state.story = story; state.idx = 0; state.score = 0;
+  state.story = story; state.idx = 0; state.score = 0; state.paused = false; state.token++;
   (story.preload || []).forEach((u) => { const i = new Image(); i.src = u; });
   $('#theend').classList.add('hidden');
   $('#curtainTitle').textContent = story.custom ? story.title : L(story.title);
@@ -586,14 +604,14 @@ $('#curtain').onclick = () => {
   const c = $('#curtain'); if (c.classList.contains('open')) return;
   c.classList.add('open'); blip(520);
   setTimeout(() => c.classList.add('hidden'), 1300);
+  speechSynthesis?.speak?.(new SpeechSynthesisUtterance(''));   // unlock voice on this tap (mobile)
   renderScene();
 };
 function updateHud() {
   const s = state.story; if (!s) return;
   const pct = Math.round((state.idx / s.scenes.length) * 100);
   $('#progress i').style.width = pct + '%';
-  $('#counter').textContent = s.custom ? `📖 ${Math.min(state.idx + 1, s.scenes.length)} / ${s.scenes.length}`
-    : `${s.counter} ${state.score} / ${s.goal}`;
+  $('#counter').textContent = state.paused ? '▶' : '⏸';
 }
 
 const imgPath = (n) => (n.includes('/') ? n : 'img/tiger/' + n + '.webp');
@@ -627,17 +645,44 @@ const api = {
   },
 };
 
+/* Movie mode: every scene plays by itself. Voice narrates, the action happens, then the next scene. */
+const later = (fn, ms) => { const tok = state.token; setTimeout(() => { if (tok === state.token && !state.paused) fn(); }, ms); };
+function narrate(text, then) { const tok = state.token; speak(text, () => { if (tok === state.token && !state.paused) then(); }); }
+function runScene() {
+  const s = state.story, sc = s.scenes[state.idx];
+  const text = s.custom ? (sc.text || '') : L(sc.text);
+  narrate(text, () => {
+    let left = sc.tap ? sc.tap.times - state.taps : 0;
+    const step = () => {
+      if (left-- > 0) { doTap(sc); later(step, 950); }
+      else later(() => next(true), sc.tap ? 2400 : 900);
+    };
+    step();
+  });
+}
+function doTap(sc) {
+  if (state.taps >= sc.tap.times) return;
+  state.taps++; state.score++; blip(500 + state.taps * 80);
+  sc.tap.onTap(state.taps, api); updateHud();
+}
+function togglePause() {
+  if (!state.story || !$('#curtain').classList.contains('open') || !$('#theend').classList.contains('hidden')) return;
+  state.paused = !state.paused; state.token++;
+  $('#counter').textContent = state.paused ? '▶' : '⏸';
+  $('#player').classList.toggle('paused', state.paused);
+  if (state.paused) speechSynthesis?.cancel?.(); else renderScene();
+}
 function renderScene() {
   const s = state.story, sc = s.scenes[state.idx], stage = $('#stage');
+  state.token++;
   stage.innerHTML = '';
+  stage.classList.remove('fadein'); void stage.offsetWidth; stage.classList.add('fadein');
   state.taps = 0; state.busy = false;
   if (s.custom) {
     stage.style.background = '#111'; stage.dataset.tone = '';
     const ph = document.createElement('div'); ph.className = 'photo' + (sc.fit ? ' fit' : '');
     ph.style.backgroundImage = `url(${sc.img})`;
     stage.append(ph);
-    setCaption(sc.text || '', state.lang === 'hi' ? 'आगे के लिए टैप करो ▶' : 'tap for next ▶');
-    speak(sc.text || '');
   } else {
     stage.style.background = '';
     stage.dataset.tone = sc.tone || '';
@@ -650,7 +695,7 @@ function renderScene() {
     }
     for (const a of sc.actors) {
       const el = document.createElement('div');
-      el.className = 'actor ' + (a.cls || ''); el.dataset.id = a.id;
+      el.className = 'actor ' + (a.cls || '').replace('tapme', ''); el.dataset.id = a.id;
       if (a.img) {
         el.classList.add('pic');
         const im = document.createElement('img'); im.alt = ''; im.src = imgPath(a.img); el.append(im);
@@ -661,28 +706,10 @@ function renderScene() {
       }
       stage.append(el);
     }
-    if (sc.after) setTimeout(() => sc.after.forEach((m) => api.move(m.id, m.x, m.y)), 400);
-    const hint = sc.tap ? L(sc.tap.hint) : (state.lang === 'hi' ? 'आगे के लिए टैप करो ▶' : 'tap for next ▶');
-    setCaption(L(sc.text), hint);
-    speak(L(sc.text));
-    if (sc.tap) {
-      const t = api.actor(sc.tap.target);
-      t.onclick = (e) => {
-        e.stopPropagation();
-        if (state.taps >= sc.tap.times) return;
-        state.taps++; state.score++; blip(500 + state.taps * 80);
-        sc.tap.onTap(state.taps, api); updateHud();
-        if (state.taps >= sc.tap.times) {
-          t.classList.remove('tapme');
-          setCaption(L(sc.text), state.lang === 'hi' ? 'शाबाश! आगे के लिए टैप करो ▶' : 'Well done! tap for next ▶');
-          speak(state.lang === 'hi' ? 'शाबाश!' : 'Well done!');
-        }
-      };
-    } else if (!s.custom) {
-      state.score = Math.min(s.goal, state.score); // story-only scenes don't change the counter
-    }
+    if (sc.after) later(() => sc.after.forEach((m) => api.move(m.id, m.x, m.y)), 400);
   }
   updateHud();
+  runScene();
 }
 function setCaption(text, hint) {
   const c = $('#caption');
@@ -696,11 +723,9 @@ function setCaption(text, hint) {
 function next() {
   const s = state.story; if (!s || !$('#curtain').classList.contains('open')) return;
   if (!$('#theend').classList.contains('hidden')) return;
-  const sc = s.scenes[state.idx];
-  if (sc && sc.tap && state.taps < sc.tap.times) { const t = api.actor(sc.tap.target); t && t.animate([{ filter: 'brightness(1.6)' }, { filter: 'none' }], 500); return; }
   state.idx++;
   if (state.idx >= s.scenes.length) return theEnd();
-  blip(440); renderScene();
+  renderScene();
 }
 function theEnd() {
   updateHud();
@@ -718,17 +743,17 @@ function theEnd() {
   }
 }
 function exitPlayer() {
-  speechSynthesis?.cancel?.();
+  state.token++; speechSynthesis?.cancel?.();
   if (fromMaker) show('maker'); else { renderHome(); show('home'); }
 }
-$('#stage').onclick = next;
-$('#caption').onclick = next;
+$('#stage').onclick = togglePause;
+$('#counter').onclick = togglePause;
 $('#homeBtn').onclick = exitPlayer;
 $('#endHome').onclick = exitPlayer;
 $('#againBtn').onclick = () => play(state.story, fromMaker);
 document.addEventListener('keydown', (e) => {
   if ($('#player').classList.contains('hidden')) return;
-  if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); $('#curtain').classList.contains('open') ? next() : $('#curtain').click(); }
+  if (e.key === ' ') { e.preventDefault(); $('#curtain').classList.contains('open') ? togglePause() : $('#curtain').click(); }
   if (e.key === 'Escape') exitPlayer();
 });
 // Swipe up / left to advance, like a reel.
@@ -737,7 +762,7 @@ $('#player').addEventListener('touchstart', (e) => { y0 = e.touches[0].clientY; 
 $('#player').addEventListener('touchend', (e) => {
   if (y0 == null) return;
   const dy = y0 - e.changedTouches[0].clientY, dx = x0 - e.changedTouches[0].clientX;
-  if (Math.max(dy, dx) > 60) next();
+  if (Math.max(dy, dx) > 60 && !state.paused) { state.token++; speechSynthesis?.cancel?.(); next(); }
   y0 = x0 = null;
 }, { passive: true });
 if ('speechSynthesis' in window) speechSynthesis.onvoiceschanged = () => {};
