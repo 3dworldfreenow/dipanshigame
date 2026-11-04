@@ -106,9 +106,9 @@
     filter: saturate(1.08) contrast(1.04); transition: filter .6s; }
   .actor.pic::before { content: ''; position: absolute; left: 8%; right: 8%; bottom: -4%; height: 14%;
     background: radial-gradient(ellipse at center, rgba(30,20,0,.45), rgba(30,20,0,0) 70%); }
-  #stage[data-tone=night] .actor.pic img { filter: brightness(.8) saturate(.85) sepia(.18) hue-rotate(-12deg) contrast(1.05)
-    drop-shadow(0 0 10px rgba(255,140,90,.35)); }
-  #stage[data-tone=night] .actor.pic::before { background: radial-gradient(ellipse at center, rgba(20,0,40,.55), rgba(20,0,40,0) 70%); }
+  #stage[data-tone=night] .actor.pic img { filter: brightness(.72) saturate(.75) contrast(1.05)
+    drop-shadow(0 0 8px rgba(120,255,220,.35)); }
+  #stage[data-tone=night] .actor.pic::before { background: radial-gradient(ellipse at center, rgba(0,20,30,.6), rgba(0,20,30,0) 70%); }
   /* picture stories without text: caption becomes a small next/tap button */
   #caption.mini { left: auto; right: 16px; transform: none; width: auto; min-height: 0; padding: 10px 16px;
     font-size: 28px; border-radius: 999px; }
@@ -249,7 +249,7 @@ const BUILTIN = [
     title: { en: 'The Tiger and the Mouse', hi: 'शेर और चूहा' },
     moral: { en: 'No one is too small to help. Be kind to everyone!', hi: 'कोई भी इतना छोटा नहीं कि मदद न कर सके। सबके साथ अच्छा बनो!' },
     counter: '⭐', goal: 11,
-    preload: ['bg_jungle', 'bg_night', 'bg_happy', 'end_friends', 'tiger_sleep', 'tiger_angry', 'tiger_laugh', 'tiger_net', 'tiger_free',
+    preload: ['bg_jungle', 'bg_night', 'bg_free', 'bg_morning', 'tiger_sit', 'tiger_sleep', 'tiger_angry', 'tiger_laugh', 'tiger_net', 'tiger_free',
               'mouse_run', 'mouse_scared', 'mouse_gnaw', 'mouse_happy', 'mouse_stand'].map((n) => 'img/tiger/' + n + '.webp'),
     scenes: [
       { sky: 'url(img/tiger/bg_jungle.webp) center/cover',
@@ -301,12 +301,15 @@ const BUILTIN = [
                  api.cls('mouse', 'shake'); api.pop(i < 5 ? 'nibble!' : 'SNAP!', 34, 66);
                  if (i === 5) setTimeout(() => { api.pose('tiger', 'tiger_free', 60); api.pose('mouse', 'mouse_happy', 22); api.cls('mouse', 'bob'); }, 500);
                } } },
-      { sky: 'url(img/tiger/bg_happy.webp) center/cover',
+      { sky: 'url(img/tiger/bg_free.webp) center/cover',
         actors: [{ id: 'tiger', img: 'tiger_free', x: 62, y: 62, s: 60, cls: 'bob' },
                  { id: 'mouse', img: 'mouse_happy', x: 22, y: 74, s: 22, cls: 'bob' }],
         text: { en: 'The tiger was free! "Thank you, little friend. I was wrong — even a small friend can be a big help!"', hi: 'शेर आज़ाद हो गया! "धन्यवाद, छोटे दोस्त। मैं गलत था — छोटा दोस्त भी बड़ी मदद कर सकता है!"' } },
-      { sky: 'url(img/tiger/end_friends.webp) center/cover',
-        actors: [{ id: 'h', e: '💖', x: 50, y: 22, s: 12, cls: 'pulse' }],
+      { sky: 'url(img/tiger/bg_morning.webp) center/cover',
+        actors: [{ id: 'tiger', img: 'tiger_sit', x: 58, y: 66, s: 58 },
+                 { id: 'mouse', img: 'mouse_stand', x: 26, y: 78, s: 24, cls: 'bob' },
+                 { id: 'h', e: '💖', x: 40, y: 40, s: 10, cls: 'pulse' },
+                 { id: 'b', e: '🦋', x: 82, y: 30, s: 9, cls: 'fly' }],
         text: { en: 'From that day on, the tiger and the mouse were best friends forever.', hi: 'उस दिन से शेर और चूहा हमेशा के लिए पक्के दोस्त बन गए।' } },
     ],
   },
