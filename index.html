@@ -101,6 +101,12 @@
   @keyframes pulse { 50% { transform: translate(-50%,-50%) scale(1.15); } }
   @keyframes zzz { 0% { opacity: 0; transform: translate(-50%,-30%); } 40% { opacity: 1; } 100% { opacity: 0; transform: translate(-10%,-150%); } }
   @keyframes shake { 25% { transform: translate(-54%,-50%); } 75% { transform: translate(-46%,-50%); } }
+  .actor.pic img { width: 100%; display: block; pointer-events: none; -webkit-user-drag: none; }
+  .actor.flip img { transform: scaleX(-1); }
+  .pop { position: absolute; transform: translate(-50%,-50%); font-weight: 800; color: #fff;
+    text-shadow: 0 2px 0 #b3202f, 0 0 8px rgba(0,0,0,.4); pointer-events: none; animation: popup 1.2s ease-out forwards; z-index: 4; }
+  @keyframes popup { 0% { opacity: 0; transform: translate(-50%,-30%) scale(.6); } 20% { opacity: 1; transform: translate(-50%,-60%) scale(1.15); }
+    100% { opacity: 0; transform: translate(-50%,-160%) scale(1); } }
   .tapme { cursor: pointer; }
   .tapme::after {
     content: "👆"; position: absolute; font-size: .35em; right: -10%; bottom: -15%;
@@ -228,6 +234,72 @@
 const L = (o) => (typeof o === 'string' ? o : (o[state.lang] || o.en));
 
 const BUILTIN = [
+  {
+    id: 'tiger', coverImg: 'img/tiger/end_friends.webp', cover: '🐯', bg: '#ffe0a8',
+    title: { en: 'The Tiger and the Mouse', hi: 'शेर और चूहा' },
+    moral: { en: 'No one is too small to help. Be kind to everyone!', hi: 'कोई भी इतना छोटा नहीं कि मदद न कर सके। सबके साथ अच्छा बनो!' },
+    counter: '⭐', goal: 11,
+    preload: ['bg_jungle', 'bg_night', 'bg_happy', 'end_friends', 'tiger_sleep', 'tiger_angry', 'tiger_laugh', 'tiger_net', 'tiger_free',
+              'mouse_run', 'mouse_scared', 'mouse_gnaw', 'mouse_happy', 'mouse_stand'].map((n) => 'img/tiger/' + n + '.webp'),
+    scenes: [
+      { sky: 'url(img/tiger/bg_jungle.webp) center/cover',
+        actors: [{ id: 'tiger', img: 'tiger_sleep', x: 58, y: 56, s: 66 },
+                 { id: 'z', e: '💤', x: 70, y: 52, s: 10, cls: 'zzz' },
+                 { id: 'mouse', img: 'mouse_run', x: 14, y: 70, s: 26, cls: 'tapme' }],
+        text: { en: 'In a big jungle, a tiger was fast asleep. A tiny mouse came running by…', hi: 'एक बड़े जंगल में एक शेर गहरी नींद में सो रहा था। तभी एक छोटा सा चूहा दौड़ता हुआ आया…' },
+        tap: { target: 'mouse', times: 1,
+               hint: { en: 'Tap the mouse 🐭', hi: 'चूहे पर टैप करो 🐭' },
+               onTap(i, api) {
+                 api.move('mouse', 36, 54);
+                 setTimeout(() => { api.hide('z'); api.pose('tiger', 'tiger_angry', 60); api.cls('tiger', 'shake'); api.pop('GRRR!', 62, 40); api.pose('mouse', 'mouse_scared', 18); api.move('mouse', 22, 68); }, 1500);
+               } } },
+      { sky: 'url(img/tiger/bg_jungle.webp) center/cover',
+        actors: [{ id: 'tiger', img: 'tiger_angry', x: 62, y: 54, s: 64, cls: 'shake' },
+                 { id: 'mouse', img: 'mouse_scared', x: 22, y: 66, s: 20 }],
+        text: { en: 'Grrr! The tiger woke up angry. He caught the little mouse with his big paw!', hi: 'ग्ररर! शेर गुस्से में जाग गया। उसने अपने बड़े पंजे से चूहे को पकड़ लिया!' } },
+      { sky: 'url(img/tiger/bg_jungle.webp) center/cover',
+        actors: [{ id: 'tiger', img: 'tiger_angry', x: 62, y: 54, s: 64 },
+                 { id: 'mouse', img: 'mouse_scared', x: 22, y: 66, s: 20, cls: 'tapme' }],
+        text: { en: '"Please let me go!" cried the mouse. "One day I will help you too!"', hi: '"मुझे छोड़ दो!" चूहा रोया। "एक दिन मैं भी तुम्हारी मदद करूँगा!"' },
+        tap: { target: 'mouse', times: 3,
+               hint: { en: 'Tap the mouse to say please 🙏', hi: 'चूहे पर टैप करके "प्लीज़" कहो 🙏' },
+               onTap(i, api) { api.pop(['🙏', 'Please!', '🥺'][i - 1], 24, 60); } } },
+      { sky: 'url(img/tiger/bg_jungle.webp) center/cover',
+        actors: [{ id: 'tiger', img: 'tiger_laugh', x: 62, y: 54, s: 54, cls: 'bob' },
+                 { id: 'ha', e: '😂', x: 80, y: 40, s: 10, cls: 'pulse' },
+                 { id: 'mouse', img: 'mouse_happy', x: 22, y: 66, s: 22 }],
+        after: [{ id: 'mouse', x: -20 }],
+        text: { en: 'The tiger laughed: "Ha ha! How can a tiny mouse ever help a big tiger?" But he let the mouse go.', hi: 'शेर हँसा: "हा हा! एक छोटा सा चूहा बड़े शेर की क्या मदद करेगा?" पर उसने चूहे को जाने दिया।' } },
+      { sky: 'url(img/tiger/bg_night.webp) center/cover',
+        actors: [{ id: 'tiger', img: 'tiger_net', x: 55, y: 56, s: 66, cls: 'tapme' }],
+        text: { en: 'A few days later, the tiger was caught in a hunter\'s rope net! He could not get out.', hi: 'कुछ दिन बाद शेर एक शिकारी के रस्सी के जाल में फँस गया! वह बाहर नहीं निकल पाया।' },
+        tap: { target: 'tiger', times: 2,
+               hint: { en: 'Tap the tiger to roar for help 🐯', hi: 'शेर पर टैप करो, मदद के लिए दहाड़ो 🐯' },
+               onTap(i, api) { api.cls('tiger', 'shake'); api.pop(i === 1 ? 'ROAR!' : 'HELP!', 55, 34); } } },
+      { sky: 'url(img/tiger/bg_night.webp) center/cover',
+        actors: [{ id: 'tiger', img: 'tiger_net', x: 62, y: 56, s: 62, cls: 'shake' },
+                 { id: 'mouse', img: 'mouse_run', x: -15, y: 70, s: 24 }],
+        after: [{ id: 'mouse', x: 24 }],
+        text: { en: 'The little mouse heard the roar. "My friend needs help!" He came running fast!', hi: 'छोटे चूहे ने दहाड़ सुनी। "मेरे दोस्त को मदद चाहिए!" वह तेज़ी से दौड़ता हुआ आया!' } },
+      { sky: 'url(img/tiger/bg_night.webp) center/cover',
+        actors: [{ id: 'tiger', img: 'tiger_net', x: 62, y: 56, s: 62 },
+                 { id: 'mouse', img: 'mouse_gnaw', x: 26, y: 70, s: 32, cls: 'tapme' }],
+        text: { en: 'Nibble, nibble! The mouse bit the thick ropes with his sharp teeth.', hi: 'कुतर-कुतर! चूहे ने अपने तेज़ दाँतों से मोटी रस्सियाँ काटीं।' },
+        tap: { target: 'mouse', times: 5,
+               hint: { en: 'Tap the mouse to bite the rope ✂️', hi: 'रस्सी काटने के लिए चूहे पर टैप करो ✂️' },
+               onTap(i, api) {
+                 api.cls('mouse', 'shake'); api.pop(i < 5 ? 'nibble!' : 'SNAP!', 34, 66);
+                 if (i === 5) setTimeout(() => { api.pose('tiger', 'tiger_free', 60); api.pose('mouse', 'mouse_happy', 22); api.cls('mouse', 'bob'); }, 500);
+               } } },
+      { sky: 'url(img/tiger/bg_happy.webp) center/cover',
+        actors: [{ id: 'tiger', img: 'tiger_free', x: 62, y: 54, s: 60, cls: 'bob' },
+                 { id: 'mouse', img: 'mouse_happy', x: 22, y: 66, s: 22, cls: 'bob' }],
+        text: { en: 'The tiger was free! "Thank you, little friend. I was wrong — even a small friend can be a big help!"', hi: 'शेर आज़ाद हो गया! "धन्यवाद, छोटे दोस्त। मैं गलत था — छोटा दोस्त भी बड़ी मदद कर सकता है!"' } },
+      { sky: 'url(img/tiger/end_friends.webp) center/cover',
+        actors: [{ id: 'h', e: '💖', x: 50, y: 22, s: 12, cls: 'pulse' }],
+        text: { en: 'From that day on, the tiger and the mouse were best friends forever.', hi: 'उस दिन से शेर और चूहा हमेशा के लिए पक्के दोस्त बन गए।' } },
+    ],
+  },
   {
     id: 'crow', cover: '🐦‍⬛', bg: '#ffe7b3',
     title: { en: 'The Thirsty Crow', hi: 'प्यासा कौवा' },
@@ -384,6 +456,7 @@ function renderHome() {
   for (const s of BUILTIN) {
     const c = card(s.cover, L(s.title), s.scenes.length + (state.lang === 'hi' ? ' दृश्य' : ' scenes'), () => play(s));
     c.querySelector('.thumb').style.background = s.bg;
+    if (s.coverImg) { const t = c.querySelector('.thumb'); t.textContent = ''; t.style.backgroundImage = `url(${s.coverImg})`; t.style.backgroundSize = 'cover'; t.style.backgroundPosition = 'center'; }
     $('#builtins').append(c);
   }
   $('#mine').innerHTML = '';
@@ -489,6 +562,7 @@ let fromMaker = false;
 function play(story, preview = false) {
   fromMaker = preview;
   state.story = story; state.idx = 0; state.score = 0;
+  (story.preload || []).forEach((u) => { const i = new Image(); i.src = u; });
   $('#theend').classList.add('hidden');
   $('#curtainTitle').textContent = story.custom ? story.title : L(story.title);
   $('#curtain').classList.remove('open', 'hidden');
@@ -509,10 +583,19 @@ function updateHud() {
     : `${s.counter} ${state.score} / ${s.goal}`;
 }
 
+const imgPath = (n) => (n.includes('/') ? n : 'img/tiger/' + n + '.webp');
 const api = {
   actor: (id) => $('#stage').querySelector(`[data-id="${id}"]`),
   move(id, x, y) { const a = api.actor(id); if (!a) return; a.style.left = x + '%'; if (y != null) a.style.top = y + '%'; },
   swap(id, e, s, y) { const a = api.actor(id); if (!a) return; a.textContent = e; a.style.fontSize = s + 'vmin'; if (y != null) a.style.top = y + '%'; },
+  pose(id, name, w) { const a = api.actor(id); if (!a) return; const im = a.querySelector('img'); if (im) im.src = imgPath(name); if (w) a.style.width = w + 'vmin'; },
+  hide(id) { const a = api.actor(id); if (a) a.style.opacity = 0; },
+  cls(id, c) { const a = api.actor(id); if (!a) return; a.classList.remove('shake', 'bob', 'walk', 'pulse'); void a.offsetWidth; a.classList.add(c); },
+  pop(text, x, y) {
+    const p = document.createElement('div'); p.className = 'pop'; p.textContent = text;
+    Object.assign(p.style, { left: x + '%', top: y + '%', fontSize: '9vmin' });
+    $('#stage').append(p); setTimeout(() => p.remove(), 1300);
+  },
   setWater(f) { const w = $('#stage .water'); if (w) w.style.height = (2 + f * 11) + '%'; },
   flyPebble() {
     const p = document.createElement('div'); p.className = 'actor'; p.textContent = '🪨';
@@ -553,8 +636,15 @@ function renderScene() {
     }
     for (const a of sc.actors) {
       const el = document.createElement('div');
-      el.className = 'actor ' + (a.cls || ''); el.dataset.id = a.id; el.textContent = a.e;
-      Object.assign(el.style, { left: a.x + '%', top: a.y + '%', fontSize: a.s + 'vmin' });
+      el.className = 'actor ' + (a.cls || ''); el.dataset.id = a.id;
+      if (a.img) {
+        el.classList.add('pic');
+        const im = document.createElement('img'); im.alt = ''; im.src = imgPath(a.img); el.append(im);
+        Object.assign(el.style, { left: a.x + '%', top: a.y + '%', width: a.s + 'vmin', fontSize: '12vmin' });
+      } else {
+        el.textContent = a.e;
+        Object.assign(el.style, { left: a.x + '%', top: a.y + '%', fontSize: a.s + 'vmin' });
+      }
       stage.append(el);
     }
     if (sc.after) setTimeout(() => sc.after.forEach((m) => api.move(m.id, m.x, m.y)), 400);
