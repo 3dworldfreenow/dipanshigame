@@ -686,7 +686,7 @@ function renderScene() {
 }
 function setCaption(text, hint) {
   const c = $('#caption');
-  const mini = state.story && !state.story.custom;
+  const mini = true;   // no on-screen text: stories are told by voice only
   c.classList.toggle('mini', !!mini);
   if (mini) { c.textContent = /tap|टैप/i.test(hint) && !/next|आगे/.test(hint) ? '👆' : '▶'; c.title = text; return; }
   c.textContent = text;
